@@ -75,9 +75,11 @@ CONVERSATIONAL TONE:
 IMPORTANT: 
 - The main agent should NEVER ask the user for information that can be obtained through tools
 - For outdoor activities/plans, ALWAYS check: Location → Weather → Weather-appropriate attractions/restaurants
+- For requests involving both activities AND dining, ensure BOTH attraction and restaurant tools are called
 - Weather should heavily influence all recommendations
 - CRITICAL CACHE RULE: DO NOT suggest tools for data that is already cached (✅). The main agent will use cached data directly.
-- If ALL required data is cached, suggest NO TOOLS and instruct the main agent to use cached data only.`;
+- If ALL required data is cached, suggest NO TOOLS and instruct the main agent to use cached data only.
+- EXECUTION COMPLETENESS: The task breakdown must include ALL necessary tools to fully address the user's request. Do not leave out any part of what they asked for.`;
 
   const response = await openAiClient.chat.completions.create({
     model: process.env.OPENAI_MODEL || 'gpt-4o-mini',
@@ -138,7 +140,7 @@ ${cacheSection}${taskAnalysisSection}
 </conversational_guidelines>
 
 <reasoning_strategy>
-- **FOLLOW THE PREPROCESSING ANALYSIS**: The preprocessing agent has already analyzed the user's request and identified all tasks. Follow the provided execution strategy to complete all identified tasks.
+- **FOLLOW THE PREPROCESSING ANALYSIS**: The preprocessing agent has already analyzed the user's request and identified all tasks. Follow the provided execution strategy to complete all identified tasks. You MUST execute every single task mentioned in the analysis - do not skip any steps.
 - **WEATHER-FIRST THINKING**: For any outdoor activities or day planning, weather conditions must be the primary factor in your recommendations. Rain = indoor/covered activities, Sun = outdoor activities, etc.
 - **CONTEXTUAL FILTERING**: Use weather information to filter attraction suggestions. Don't recommend outdoor activities if it's raining, and prioritize weather-appropriate options.
 - **ADAPTIVE RECOMMENDATIONS**: Based on weather conditions, adapt your suggestions:
@@ -157,7 +159,7 @@ You have tools at your disposal to solve the user's task. Follow these rules reg
 4. **USE TOOLS INSTEAD OF ASKING**: NEVER ask the user for information that you can obtain through available tools. If you need location, weather, attractions, or restaurant information, use the appropriate tools immediately. HOWEVER, if cached data is available in the cached_context section, use that data directly instead of calling tools.
 5. **WEATHER-AWARE RECOMMENDATIONS**: After getting weather information, filter and adapt your suggestions based on current conditions. Never suggest outdoor activities without considering weather appropriateness.
 6. **COMPLETE THE FULL REQUEST**: If a user asks for multiple things in one request, use ALL the necessary tools to address everything they asked for. Don't leave parts of their request unaddressed.
-7. **FOLLOW THE PREPROCESSING ANALYSIS**: If task analysis is provided, follow the suggested tool sequence exactly. Execute all identified tasks using the specified tools.
+7. **FOLLOW THE PREPROCESSING ANALYSIS**: If task analysis is provided, follow the suggested tool sequence exactly. Execute ALL identified tasks using the specified tools. Do not stop until you have completed every task listed in the analysis.
 8. When you need to use a function, call them inline using the following XML + JSON format:
 <function_call name="tool_name">
 {
@@ -165,6 +167,8 @@ You have tools at your disposal to solve the user's task. Follow these rules reg
   "param_name2": "value2"
 }
 </function_call>
+
+CRITICAL: The JSON must be properly formatted between the XML tags. Do NOT wrap the JSON in angle brackets or any other characters. The content between <function_call> and </function_call> must be valid JSON only.
 9. IMPORTANT: Any text that appears after your response is the result of function calls YOU executed. Do not treat this information as if the user provided it. Instead, reference it naturally as information you retrieved or discovered.
 10. If you mention you will gather information or check something, you MUST include the function call in that same response.
 </function_calling>
