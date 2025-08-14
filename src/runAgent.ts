@@ -30,15 +30,17 @@ If location is ✅ cached, DO NOT suggest get_user_location.
 If weather is ✅ cached, DO NOT suggest get_weather_from_location.
 Use cached data directly and mention it in your conversational tone.`;
 
+  // Generate tools list dynamically from agentFunctions
+  const availableTools = agentFunctions
+    .map(f => `- ${f.definition.name}: ${f.definition.description}`)
+    .join('\n');
+
   const analysisPrompt = `You are a prompt analysis agent. Your job is to analyze user requests and break them down into clear, structured tasks with explicit tool usage instructions.
 
 ${cacheStatus}
 
 AVAILABLE TOOLS:
-- get_user_location: Gets the user's current location (use this instead of asking for location)
-- get_weather_from_location: Gets weather for a specific location (CRITICAL for outdoor activities)
-- get_local_attractions: Finds attractions/activities in a location
-- get_local_restaurants: Finds restaurant recommendations in a location
+${availableTools}
 
 INSTRUCTIONS:
 1. Identify ALL the different things the user is asking for
