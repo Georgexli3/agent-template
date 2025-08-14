@@ -25,7 +25,10 @@ CACHED DATA AVAILABLE:
 - Restaurants: ${cachedData.restaurants ? '✅ Cached' : '❌ Not cached'}
 - Attractions: ${cachedData.attractions ? '✅ Cached' : '❌ Not cached'}
 
-Only suggest tools for data that is NOT cached (❌). Use cached data in your recommendations.`;
+CRITICAL: Only suggest tools for data that is NOT cached (❌). 
+If location is ✅ cached, DO NOT suggest get_user_location.
+If weather is ✅ cached, DO NOT suggest get_weather_from_location.
+Use cached data directly and mention it in your conversational tone.`;
 
   const analysisPrompt = `You are a prompt analysis agent. Your job is to analyze user requests and break them down into clear, structured tasks with explicit tool usage instructions.
 
@@ -71,7 +74,8 @@ IMPORTANT:
 - The main agent should NEVER ask the user for information that can be obtained through tools
 - For outdoor activities/plans, ALWAYS check: Location → Weather → Weather-appropriate attractions/restaurants
 - Weather should heavily influence all recommendations
-- ONLY suggest tools for data that is not already cached - use cached data directly when available`;
+- CRITICAL CACHE RULE: DO NOT suggest tools for data that is already cached (✅). The main agent will use cached data directly.
+- If ALL required data is cached, suggest NO TOOLS and instruct the main agent to use cached data only.`;
 
   const response = await openAiClient.chat.completions.create({
     model: process.env.OPENAI_MODEL || 'gpt-4o-mini',
@@ -122,6 +126,7 @@ Use this analysis to ensure you complete ALL the identified tasks and follow the
 You will receive a message from the user. Your objective is to be as helpful as possible.
 Use the context to better understand the user's situation and provide more relevant responses.
 </input_format>
+
 ${cacheSection}${taskAnalysisSection}
 
 <conversational_guidelines>
@@ -147,7 +152,7 @@ You have tools at your disposal to solve the user's task. Follow these rules reg
 1. ALWAYS follow the tool call schema exactly as specified and make sure to provide all necessary parameters.
 2. The conversation may reference tools that are not explicitly provided. NEVER call tools that are not explicitly provided.
 3. **NEVER refer to tool names when speaking to the USER.** For example, instead of saying 'I need to use the get_user_location tool', just say 'I'll check your location'.
-4. **USE TOOLS INSTEAD OF ASKING**: NEVER ask the user for information that you can obtain through available tools. If you need location, weather, attractions, or restaurant information, use the appropriate tools immediately.
+4. **USE TOOLS INSTEAD OF ASKING**: NEVER ask the user for information that you can obtain through available tools. If you need location, weather, attractions, or restaurant information, use the appropriate tools immediately. HOWEVER, if cached data is available in the cached_context section, use that data directly instead of calling tools.
 5. **WEATHER-AWARE RECOMMENDATIONS**: After getting weather information, filter and adapt your suggestions based on current conditions. Never suggest outdoor activities without considering weather appropriateness.
 6. **COMPLETE THE FULL REQUEST**: If a user asks for multiple things in one request, use ALL the necessary tools to address everything they asked for. Don't leave parts of their request unaddressed.
 7. **FOLLOW THE PREPROCESSING ANALYSIS**: If task analysis is provided, follow the suggested tool sequence exactly. Execute all identified tasks using the specified tools.
