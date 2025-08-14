@@ -17,7 +17,8 @@ async function promptUser(): Promise<void> {
       return;
     }
 
-    await runAgent({ input });
+    const result = await runAgent(input);
+    console.log(result);
 
     await promptUser();
   });

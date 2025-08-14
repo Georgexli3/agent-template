@@ -34,3 +34,6 @@ dist/
 
 # Claude Code
 .claude
+
+# Agent cache directory
+.cache/

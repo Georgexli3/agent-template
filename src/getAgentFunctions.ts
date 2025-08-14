@@ -1,7 +1,14 @@
-import { GetUserLocationFunction } from "./functions/getUserLocation";
-import { GetWeatherFromLocationFunction } from "./functions/getWeatherFromLocation";
+import getUserLocation from './functions/getUserLocationWrapper';
+import getWeatherFromLocation from './functions/getWeatherFromLocationWrapper';
+import getLocalAttractions from './functions/getLocalAttractions';
+import getLocalRestaurants from './functions/getLocalRestaurants';
+import { AgentFunction } from './functions/types';
 
-export const agentFunctions = [
-  new GetUserLocationFunction(),
-  new GetWeatherFromLocationFunction(),
+const agentFunctions: AgentFunction[] = [
+  getUserLocation,
+  getWeatherFromLocation,
+  getLocalAttractions,
+  getLocalRestaurants,
 ];
+
+export default agentFunctions;
