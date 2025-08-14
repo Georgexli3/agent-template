@@ -197,13 +197,29 @@ function showToolCompleteMessage(toolName: string, result: string) {
 }
 
 function parseFunctionCall(content: string): { toolName: string | null; args: any } {
-  const match = content.match(/<function_call name="([^"]+)">\s*(\{[\s\S]*?\})\s*<\/function_call>/);
-  if (!match) return { toolName: null, args: null };
+  let match = content.match(/<function_call name="([^"]+)">\s*(\{[\s\S]*?\})\s*<\/function_call>/);
+  
+  if (!match) {
+    match = content.match(/<function_call name="([^"]+)"><(\{[\s\S]*?\})><\/function_call>/);
+    if (match) {
+      console.log('⚠️  Warning: Detected malformed function call with extra angle brackets. Attempting to parse...');
+    }
+  }
+  
+  if (!match) {
+    console.log('❌ Failed to parse function call from content:', content.substring(content.indexOf('<function_call'), content.indexOf('</function_call>') + 16));
+    return { toolName: null, args: null };
+  }
+  
   const toolName = match[1];
+  const jsonString = match[2].trim();
+  
   let args;
   try {
-    args = JSON.parse(match[2].trim());
-  } catch {
+    args = JSON.parse(jsonString);
+  } catch (error) {
+    console.log('❌ Failed to parse JSON:', jsonString);
+    console.log('Parse error:', error instanceof Error ? error.message : String(error));
     return { toolName: null, args: null };
   }
   return { toolName, args };
