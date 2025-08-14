@@ -1,12 +1,10 @@
 import { getOpenAiClient } from "./getOpenAiClient";
 
+// This is the default system prompt. You can modify it to your liking, but we'd recommend leaving the function_calling instructions mainly as is.
 const systemPrompt = `You are a powerful agentic assistant helping the daily lives of the user.
 
 <input_format>
-You will receive user messages in the following format:
-- <context>...</context> (optional): Additional context or background information relevant to the user's query
-- <user_query>...</user_query>: The main question or request from the user
-
+You will receive a message from the user. Your objective is to be as helpful as possible.
 Use the context to better understand the user's situation and provide more relevant responses.
 </input_format>
 

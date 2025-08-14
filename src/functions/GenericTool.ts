@@ -1,3 +1,4 @@
+/* DO NOT MODIFY THIS FILE */
 export abstract class AgentFunction<T> {
   abstract definition: any;
 
