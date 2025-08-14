@@ -63,3 +63,6 @@ But with these tools, the agent would be able to answer "What is the weather tod
 - If you look at the default system prompt in `runAgent.ts`, you'll notice we don't do the typical function calling structure. We instead ask the AI to return the function call in a JSON/XML format at the end of the message. This is intentional and an exercise left to the reader how to handle this.
 - You are welcome to use any AI tools; we just ask that you don't completely one-shot it with something like Claude Code lol
 - Be wary of accidental infinite loops that call the LLM
+- The tools are hard-coded / mock tools right now. That's totally fine.
+
+hint: would recommend starting with "Where am I?"
